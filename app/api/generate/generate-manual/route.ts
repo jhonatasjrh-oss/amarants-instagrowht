@@ -2,12 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { createClient } from '@supabase/supabase-js'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const getOpenAI = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const getSupabase = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
 export async function POST(request: NextRequest) {
   try {
@@ -88,7 +84,7 @@ RETORNE APENAS um JSON válido:
 
     contentParts.push({ type: 'text', text: prompt })
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: 'gpt-4o',
       messages: [{ role: 'user', content: contentParts }],
       response_format: { type: 'json_object' },
@@ -100,7 +96,7 @@ RETORNE APENAS um JSON válido:
 
     // ── Salva no banco ────────────────────────────────
     if (userId) {
-      await supabase.from('content_items').insert({
+      await getSupabase().from('content_items').insert({
         user_id:  userId,
         tipo:     data.sugestao_formato?.toLowerCase() || 'post',
         titulo:   data.titulo,

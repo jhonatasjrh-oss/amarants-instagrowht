@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const getSupabase = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
 export async function PATCH(
   request: NextRequest,
@@ -14,7 +11,7 @@ export async function PATCH(
     const { id } = await ctx.params
     const body = await request.json()
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('content_items')
       .update({ ...body, updated_at: new Date().toISOString() })
       .eq('id', id)
@@ -33,7 +30,7 @@ export async function DELETE(
   try {
     const { id } = await ctx.params
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('content_items')
       .delete()
       .eq('id', id)

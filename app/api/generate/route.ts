@@ -2,12 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { createClient } from '@supabase/supabase-js'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const getOpenAI = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const getSupabase = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,8 +12,7 @@ export async function POST(request: NextRequest) {
     // Busca brand_kit do usuário para personalizar o prompt
     let brandKit: Record<string, string> | null = null
     if (userId) {
-      const { data } = await supabase
-        .from('brand_kit')
+      const { data } = await getSupabase().from('brand_kit')
         .select('*')
         .eq('user_id', userId)
         .single()
@@ -78,7 +73,7 @@ Use o mix ideal: 3 Reels, 2 Carrosséis, 1 Post, 1 Story.
 Cada conteúdo deve ser específico para o nicho ${nichoFinal} e objetivo ${objetivo}.
 `
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: 'gpt-4o',
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
@@ -90,7 +85,7 @@ Cada conteúdo deve ser específico para o nicho ${nichoFinal} e objetivo ${obje
 
     if (userId && data.itens) {
       for (const item of data.itens) {
-        await supabase.from('content_items').insert({
+        await getSupabase().from('content_items').insert({
           user_id:  userId,
           tipo:     item.formato.toLowerCase(),
           titulo:   item.tema,

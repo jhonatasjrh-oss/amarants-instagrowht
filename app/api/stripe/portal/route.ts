@@ -2,12 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!)
+const getSupabase = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +13,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'userId obrigatório' }, { status: 400 })
     }
 
-    const { data: kit } = await supabase
+    const sb = getSupabase()
+    const st = getStripe()
+
+    const { data: kit } = await sb
       .from('brand_kit')
       .select('stripe_customer_id')
       .eq('user_id', userId)
@@ -29,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_URL || request.headers.get('origin') || 'http://localhost:3000'
 
-    const session = await stripe.billingPortal.sessions.create({
+    const session = await st.billingPortal.sessions.create({
       customer:   kit.stripe_customer_id,
       return_url: `${baseUrl}/dashboard`,
     })

@@ -2,12 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!)
+const getSupabase = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
 const PRICES: Record<string, string> = {
   starter:  process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID!,
@@ -36,7 +32,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Busca ou cria o Stripe Customer vinculado ao usuário
-    const { data: kit } = await supabase
+    const sb = getSupabase()
+    const st = getStripe()
+
+    const { data: kit } = await sb
       .from('brand_kit')
       .select('stripe_customer_id, nome_dono, nome_marca')
       .eq('user_id', userId)
@@ -45,18 +44,17 @@ export async function POST(request: NextRequest) {
     let customerId = kit?.stripe_customer_id
 
     if (!customerId) {
-      // Busca email do usuário
-      const { data: userData } = await supabase.auth.admin.getUserById(userId)
+      const { data: userData } = await sb.auth.admin.getUserById(userId)
       const email = userData?.user?.email || ''
 
-      const customer = await stripe.customers.create({
+      const customer = await st.customers.create({
         email,
         name:     kit?.nome_dono  || kit?.nome_marca || email,
         metadata: { userId },
       })
       customerId = customer.id
 
-      await supabase
+      await sb
         .from('brand_kit')
         .update({ stripe_customer_id: customerId })
         .eq('user_id', userId)
@@ -64,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_URL || request.headers.get('origin') || 'http://localhost:3000'
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await st.checkout.sessions.create({
       customer:             customerId,
       payment_method_types: ['card'],
       mode:                 'subscription',

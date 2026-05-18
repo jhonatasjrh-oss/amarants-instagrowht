@@ -2,12 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!)
+const getSupabase = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
 // Stripe requer o body RAW (não parseado) para verificar a assinatura
 export async function POST(request: NextRequest) {
@@ -18,10 +14,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Sem stripe-signature' }, { status: 400 })
   }
 
+  const st = getStripe()
+  const sb = getSupabase()
+
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = st.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
   } catch (err: any) {
     console.error('[webhook] Assinatura inválida:', err.message)
     return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 })
@@ -37,7 +36,7 @@ export async function POST(request: NextRequest) {
 
         if (!userId || !planId) break
 
-        await supabase.from('brand_kit').update({
+        await sb.from('brand_kit').update({
           plano:                   planId,
           subscription_status:     'active',
           stripe_customer_id:      session.customer as string,
@@ -57,7 +56,7 @@ export async function POST(request: NextRequest) {
         const status  = sub.status === 'active' ? 'active' : 'past_due'
         const endDate = new Date(((sub as any).current_period_end as number) * 1000).toISOString()
 
-        await supabase.from('brand_kit').update({
+        await sb.from('brand_kit').update({
           subscription_status:    status,
           subscription_end_date:  endDate,
           updated_at:             new Date().toISOString(),
@@ -72,7 +71,7 @@ export async function POST(request: NextRequest) {
 
         if (!userId) break
 
-        await supabase.from('brand_kit').update({
+        await sb.from('brand_kit').update({
           plano:                  'free',
           subscription_status:    'inactive',
           stripe_subscription_id: null,
@@ -87,7 +86,7 @@ export async function POST(request: NextRequest) {
         const invoice    = event.data.object as Stripe.Invoice
         const customerId = invoice.customer as string
 
-        await supabase.from('brand_kit').update({
+        await sb.from('brand_kit').update({
           subscription_status: 'past_due',
           updated_at:          new Date().toISOString(),
         }).eq('stripe_customer_id', customerId)
