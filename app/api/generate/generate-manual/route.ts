@@ -5,6 +5,15 @@ import { createClient } from '@supabase/supabase-js'
 const getOpenAI = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 const getSupabase = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
+function normalizeTipo(formato: string): string {
+  const f = (formato || '').toLowerCase().trim()
+  if (f.includes('reel'))    return 'reel'
+  if (f.includes('carros'))  return 'carrossel'
+  if (f.includes('stor'))    return 'story'
+  if (f.includes('banner'))  return 'banner'
+  return 'post'
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData      = await request.formData()
@@ -98,7 +107,7 @@ RETORNE APENAS um JSON válido:
     if (userId) {
       await getSupabase().from('content_items').insert({
         user_id:  userId,
-        tipo:     data.sugestao_formato?.toLowerCase() || 'post',
+        tipo:     normalizeTipo(data.sugestao_formato || ''),
         titulo:   data.titulo,
         legenda:  data.legenda,
         hashtags: data.hashtags,

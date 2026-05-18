@@ -5,6 +5,15 @@ import { createClient } from '@supabase/supabase-js'
 const getOpenAI = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 const getSupabase = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
+function normalizeTipo(formato: string): string {
+  const f = (formato || '').toLowerCase().trim()
+  if (f.includes('reel'))    return 'reel'
+  if (f.includes('carros'))  return 'carrossel'
+  if (f.includes('stor'))    return 'story'
+  if (f.includes('banner'))  return 'banner'
+  return 'post'
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { nicho, objetivo, userId } = await request.json()
@@ -87,7 +96,7 @@ Cada conteúdo deve ser específico para o nicho ${nichoFinal} e objetivo ${obje
       for (const item of data.itens) {
         await getSupabase().from('content_items').insert({
           user_id:  userId,
-          tipo:     item.formato.toLowerCase(),
+          tipo:     normalizeTipo(item.formato),
           titulo:   item.tema,
           legenda:  item.legenda,
           hashtags: item.hashtags,

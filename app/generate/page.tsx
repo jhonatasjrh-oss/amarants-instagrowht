@@ -224,7 +224,7 @@ export default function Generate() {
       formData.append('userId',    user?.id || '')
       imagens.forEach(img => formData.append('imagens', img))
       if (pdfFile) formData.append('pdf', pdfFile)
-      const res  = await fetch('/api/generate-manual', { method: 'POST', body: formData })
+      const res  = await fetch('/api/generate/generate-manual', { method: 'POST', body: formData })
       const json = await res.json()
       if (!json.success) throw new Error(json.error)
       setResultadoManual(json.data)
