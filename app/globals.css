@@ -1,26 +1,67 @@
-@import "tailwindcss";
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --bg:       #f4f5f7;
+  --branco:   #ffffff;
+  --card:     #ffffff;
+  --card2:    #f8f9fb;
+  --borda:    rgba(0,0,0,0.08);
+  --borda2:   rgba(0,0,0,0.14);
+  --azul:     #0d1f3c;
+  --azul-mid: #1a2f5e;
+  --verde:    #3db860;
+  --verde2:   #2d9e50;
+  --texto:    #1a1a2e;
+  --muted:    #6b7280;
+  --muted2:   #9ca3af;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(61,184,96,0.3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(61,184,96,0.5); }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(61,184,96,0.6); }
+  50%       { box-shadow: 0 0 0 6px rgba(61,184,96,0); }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.animate-fadeinup { animation: fadeInUp 0.5s ease both; }
+.pulse-dot { animation: pulse-dot 2s infinite; }
+
+.card-hover { transition: all 0.2s; }
+.card-hover:hover {
+  border-color: rgba(61,184,96,0.3) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+}
+
+.nav-item { transition: all 0.15s; }
+.nav-item:hover {
+  background: rgba(61,184,96,0.08) !important;
+  color: #2d9e50 !important;
+}
+
+.btn-hover { transition: all 0.2s; }
+.btn-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(61,184,96,0.35) !important;
 }
