@@ -207,7 +207,6 @@ export default function ActionPlan() {
 
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(8)
-      doc.setTextColor('rgba(255,255,255,0.6)' as any)
       doc.setTextColor(180, 190, 210)
       doc.text(`Gerado em ${new Date().toLocaleDateString('pt-BR')}`, W - ML, 33, { align: 'right' })
 
