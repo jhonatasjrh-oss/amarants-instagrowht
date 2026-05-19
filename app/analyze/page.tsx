@@ -146,7 +146,7 @@ function AnalyzePage() {
           @keyframes bar   { 0%{width:0} 100%{width:100%} }
         `}</style>
         <div style={{ minHeight: '100vh', background: S.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif', padding: '32px 20px' }}>
-          <Image src="/logo.png" alt="Logo" width={40} height={40} style={{ borderRadius: '10px', marginBottom: '40px' }} />
+          <Image src="/logo-dark.png" alt="Logo" width={40} height={40} style={{ borderRadius: '10px', marginBottom: '40px' }} />
 
           {/* Spinner grande */}
           <div style={{ width: '96px', height: '96px', borderRadius: '50%', border: '4px solid rgba(61,184,96,0.15)', borderTop: `4px solid ${S.verde}`, animation: 'spin 1s linear infinite', marginBottom: '32px' }} />
@@ -206,7 +206,7 @@ function AnalyzePage() {
 
           {/* Header */}
           <div className="fade-up" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '36px' }}>
-            <Image src="/logo.png" alt="Logo" width={36} height={36} style={{ borderRadius: '9px' }} />
+            <Image src="/logo-dark.png" alt="Logo" width={36} height={36} style={{ borderRadius: '9px' }} />
             <div>
               <div style={{ color: S.side, fontWeight: 900, fontSize: '13px', letterSpacing: '3px' }}>AMARANTS</div>
               <div style={{ color: S.verde, fontSize: '8px', letterSpacing: '2.5px', textTransform: 'uppercase' }}>Instagrowht</div>

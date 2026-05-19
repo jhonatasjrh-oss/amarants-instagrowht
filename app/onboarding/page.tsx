@@ -176,7 +176,7 @@ export default function Onboarding() {
 
       {/* Logo */}
       <div style={{ marginBottom: '28px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <Image src="/logo.png" alt="Logo" width={36} height={36} style={{ borderRadius: '9px' }} />
+        <Image src="/logo-dark.png" alt="Logo" width={36} height={36} style={{ borderRadius: '9px' }} />
         <div>
           <div style={{ color: S.azul, fontWeight: 900, fontSize: '13px', letterSpacing: '2px' }}>AMARANTS</div>
           <div style={{ color: S.verde, fontSize: '9px', letterSpacing: '2px', textTransform: 'uppercase' }}>Instagrowht</div>

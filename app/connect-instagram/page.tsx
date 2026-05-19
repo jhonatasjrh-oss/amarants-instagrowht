@@ -84,7 +84,7 @@ export default function ConnectInstagram() {
 
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px' }}>
-          <Image src="/logo.png" alt="Logo" width={40} height={40} style={{ borderRadius: '10px' }} />
+          <Image src="/logo-dark.png" alt="Logo" width={40} height={40} style={{ borderRadius: '10px' }} />
           <div>
             <div style={{ color: S.side, fontWeight: 900, fontSize: '14px', letterSpacing: '3px' }}>AMARANTS</div>
             <div style={{ color: S.verde, fontSize: '9px', letterSpacing: '2.5px', textTransform: 'uppercase', marginTop: '2px' }}>Instagrowht</div>
@@ -162,7 +162,7 @@ export default function ConnectInstagram() {
         </div>
 
         {/* Pular */}
-        <button onClick={() => { window.location.href = '/analyze?handle=&skip=1' }} style={{ marginTop: '24px', background: 'none', border: 'none', color: S.muted, fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}>
+        <button type="button" onClick={() => { window.location.href = '/analyze?handle=&skip=1' }} style={{ marginTop: '24px', background: 'none', border: 'none', color: S.muted, fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}>
           Pular esta etapa por enquanto
         </button>
       </div>

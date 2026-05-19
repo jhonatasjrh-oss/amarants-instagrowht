@@ -153,7 +153,7 @@ export default function Pricing() {
       {/* Nav */}
       <nav style={{ background: S.card, borderBottom: `1px solid ${S.borda}`, padding: '0 40px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10, boxShadow: '0 1px 8px rgba(0,0,0,0.04)' }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
-          <Image src="/logo.png" alt="Logo" width={36} height={36} style={{ borderRadius: '9px' }} />
+          <Image src="/logo-dark.png" alt="Logo" width={36} height={36} style={{ borderRadius: '9px' }} />
           <div>
             <div style={{ color: S.azul, fontWeight: 900, fontSize: '13px', letterSpacing: '2px' }}>AMARANTS</div>
             <div style={{ color: S.verde, fontSize: '8px', letterSpacing: '2px', textTransform: 'uppercase' }}>Instagrowht</div>
