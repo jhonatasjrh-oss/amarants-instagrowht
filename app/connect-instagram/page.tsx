@@ -36,7 +36,10 @@ export default function ConnectInstagram() {
 
   async function handleAnalisar(e: React.FormEvent) {
     e.preventDefault()
-    if (!handle.trim()) { setErro('Digite seu @ do Instagram.'); return }
+    if (!handle.trim()) {
+      setErro('Por favor, informe seu @ do Instagram para continuar.')
+      return
+    }
     setErro('')
     setLoading(true)
     try {
@@ -57,9 +60,8 @@ export default function ConnectInstagram() {
     <>
       <style>{`
         * { box-sizing: border-box; }
-        @keyframes spin   { to { transform: rotate(360deg); } }
-        @keyframes pulse  { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.95)} }
-        @keyframes float  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes spin  { to { transform: rotate(360deg); } }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
         .inp-handle {
           width: 100%; padding: 16px 18px 16px 52px;
           background: #f8f9fb; border: 2px solid rgba(0,0,0,0.10);
@@ -68,6 +70,7 @@ export default function ConnectInstagram() {
           letter-spacing: 0.3px;
         }
         .inp-handle:focus { border-color: #3db860; background: #fff; }
+        .inp-handle.erro  { border-color: #ef4444; background: #fff9f9; }
         .btn-analisar {
           width: 100%; padding: 16px; background: #3db860;
           color: #fff; border: none; border-radius: 12px;
@@ -76,7 +79,7 @@ export default function ConnectInstagram() {
           display: flex; align-items: center; justify-content: center;
           gap: 10px; font-family: Inter, sans-serif; letter-spacing: 0.3px;
         }
-        .btn-analisar:hover  { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(61,184,96,0.45); }
+        .btn-analisar:hover   { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(61,184,96,0.45); }
         .btn-analisar:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
       `}</style>
 
@@ -99,7 +102,13 @@ export default function ConnectInstagram() {
             return (
               <div key={step} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: feito ? S.verde : ativo ? S.side : S.borda, border: `2px solid ${feito ? S.verde : ativo ? S.side : 'rgba(0,0,0,0.1)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: feito || ativo ? '#fff' : S.muted, fontWeight: 700 }}>
+                  <div style={{
+                    width: '28px', height: '28px', borderRadius: '50%',
+                    background: feito ? S.verde : ativo ? S.side : S.borda,
+                    border: `2px solid ${feito ? S.verde : ativo ? S.side : 'rgba(0,0,0,0.1)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '12px', color: feito || ativo ? '#fff' : S.muted, fontWeight: 700,
+                  }}>
                     {feito ? '✓' : i + 1}
                   </div>
                   <span style={{ fontSize: '10px', color: ativo ? S.side : S.muted, fontWeight: ativo ? 700 : 400 }}>{step}</span>
@@ -119,31 +128,41 @@ export default function ConnectInstagram() {
           <h1 style={{ color: S.texto, fontWeight: 900, fontSize: '26px', margin: '0 0 12px', letterSpacing: '-0.5px' }}>
             Conecte seu Instagram
           </h1>
-          <p style={{ color: S.muted, fontSize: '15px', lineHeight: 1.7, margin: '0 0 36px' }}>
+          <p style={{ color: S.muted, fontSize: '15px', lineHeight: 1.7, margin: '0 0 32px' }}>
             Digite o seu @ e nossa IA vai analisar seu perfil<br />
             e criar um plano de crescimento personalizado.
           </p>
 
           <form onSubmit={handleAnalisar}>
-            <div style={{ position: 'relative', marginBottom: '16px' }}>
+
+            {/* Campo @ */}
+            <div style={{ position: 'relative', marginBottom: '10px' }}>
               <span style={{ position: 'absolute', left: '18px', top: '50%', transform: 'translateY(-50%)', color: S.verde, fontSize: '20px', fontWeight: 900, lineHeight: 1 }}>@</span>
               <input
-                className="inp-handle"
+                className={`inp-handle${erro ? ' erro' : ''}`}
                 type="text"
                 placeholder="seuinstagram"
                 value={handle}
-                onChange={e => setHandle(e.target.value.replace('@', ''))}
+                onChange={e => { setHandle(e.target.value.replace('@', '')); setErro('') }}
                 disabled={loading}
                 autoFocus
+                required
               />
             </div>
 
+            {/* Mensagem explicativa */}
+            <p style={{ color: S.muted, fontSize: '12px', lineHeight: 1.6, margin: '0 0 16px', textAlign: 'left' }}>
+              🔒 Usamos seu @ apenas para analisar seu perfil público. Não publicamos nada sem sua autorização.
+            </p>
+
+            {/* Erro */}
             {erro && (
-              <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', fontSize: '12px', padding: '10px 14px', borderRadius: '8px', marginBottom: '14px', textAlign: 'left' }}>
-                ⚠️ {erro}
+              <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', fontSize: '13px', padding: '11px 14px', borderRadius: '9px', marginBottom: '14px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>⚠️</span> {erro}
               </div>
             )}
 
+            {/* Botão */}
             <button type="submit" disabled={loading} className="btn-analisar">
               {loading ? (
                 <>
@@ -151,20 +170,11 @@ export default function ConnectInstagram() {
                   Salvando...
                 </>
               ) : (
-                <>🔍 Analisar meu perfil</>
+                <>Analisar meu perfil →</>
               )}
             </button>
           </form>
-
-          <p style={{ color: S.muted, fontSize: '12px', marginTop: '20px', lineHeight: 1.6 }}>
-            🔒 Não precisamos da sua senha. Análise 100% baseada em dados públicos.
-          </p>
         </div>
-
-        {/* Pular */}
-        <button type="button" onClick={() => { window.location.href = '/analyze?handle=&skip=1' }} style={{ marginTop: '24px', background: 'none', border: 'none', color: S.muted, fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}>
-          Pular esta etapa por enquanto
-        </button>
       </div>
     </>
   )
