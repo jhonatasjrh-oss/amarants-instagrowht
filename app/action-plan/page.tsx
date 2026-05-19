@@ -86,9 +86,13 @@ export default function ActionPlan() {
       setUserId(uid)
       const res  = await fetch(`/api/analyze-instagram?userId=${uid}`)
       const json = await res.json()
-      if (json.success) setAnalysis(json.data)
-      else setErro('Não foi possível carregar o plano. Volte para a análise.')
-      setLoading(false)
+      if (json.success && json.data) {
+        setAnalysis(json.data)
+        setLoading(false)
+      } else {
+        // Sem análise salva → volta para /analyze
+        window.location.href = '/analyze'
+      }
     })
   }, [])
 

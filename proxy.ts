@@ -1,8 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PROTECTED        = ['/dashboard', '/generate', '/calendar', '/brand-kit', '/library']
-const ONBOARDING_STEPS = ['/connect-instagram', '/analyze', '/action-plan']
+// Requer auth + onboarding_completo = true
+const PROTECTED = ['/dashboard', '/generate', '/calendar', '/brand-kit', '/library']
+
+// Requer auth + onboarding_completo = false (etapas do fluxo de onboarding)
+const ONBOARDING_STEPS = ['/connect-instagram', '/analyze']
+
+// Requer auth apenas (acessível independente do onboarding_completo)
+const AUTH_ONLY = ['/action-plan']
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -27,13 +33,14 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
 
-  const isProtected     = PROTECTED.some(r => path.startsWith(r))
-  const isOnboarding    = ONBOARDING_STEPS.some(r => path.startsWith(r))
-  const isLogin         = path === '/login'
-  const isRegister      = path === '/register'
+  const isProtected  = PROTECTED.some(r => path.startsWith(r))
+  const isOnboarding = ONBOARDING_STEPS.some(r => path.startsWith(r))
+  const isAuthOnly   = AUTH_ONLY.some(r => path.startsWith(r))
+  const isLogin      = path === '/login'
+  const isRegister   = path === '/register'
 
   // Não autenticado → login
-  if (!user && (isProtected || isOnboarding)) {
+  if (!user && (isProtected || isOnboarding || isAuthOnly)) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -50,7 +57,7 @@ export async function proxy(request: NextRequest) {
     )
   }
 
-  // Autenticado em rota protegida ou de onboarding → checar brand_kit
+  // Autenticado em rota protegida ou etapa de onboarding → checar brand_kit
   if (user && (isProtected || isOnboarding)) {
     const { data: kit } = await supabase
       .from('brand_kit')
@@ -59,14 +66,17 @@ export async function proxy(request: NextRequest) {
       .single()
     const completo = kit?.onboarding_completo ?? false
 
+    // Rota protegida sem onboarding → manda para connect-instagram
     if (isProtected && !completo) {
       return NextResponse.redirect(new URL('/connect-instagram', request.url))
     }
+    // Etapa de onboarding já concluída → manda para dashboard
     if (isOnboarding && completo) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }
 
+  // AUTH_ONLY: autenticado = OK, sem checar onboarding
   return supabaseResponse
 }
 
