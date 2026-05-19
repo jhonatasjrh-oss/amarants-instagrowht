@@ -107,7 +107,7 @@ export default function Pricing() {
 
   async function handleCheckout(planId: string) {
     if (!userId) {
-      router.push(`/login?redirect=/pricing`)
+      router.push(`/register?plano=${planId}`)
       return
     }
     if (planoAtual === planId) return
