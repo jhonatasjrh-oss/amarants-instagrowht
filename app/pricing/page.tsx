@@ -316,12 +316,14 @@ export default function Pricing() {
 
         {/* Footer */}
         <div style={{ textAlign: 'center', marginTop: '48px', paddingTop: '24px', borderTop: `1px solid ${S.borda}`, color: S.muted, fontSize: '12px' }}>
-          <div style={{ marginBottom: '6px' }}>
+          <div style={{ marginBottom: '10px' }}>
             Amarants Expansão Digital · Estruturas digitais para seus negócios!
           </div>
-          <div>
-            <a href="https://produtosamarante.com/" target="_blank" rel="noreferrer" style={{ color: S.muted, marginRight: '16px' }}>Site</a>
-            <a href="https://wa.me/5562993277239" target="_blank" rel="noreferrer" style={{ color: S.muted }}>WhatsApp</a>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
+            <a href="https://produtosamarante.com/" target="_blank" rel="noreferrer" style={{ color: S.muted, textDecoration: 'none' }}>Site</a>
+            <a href="https://wa.me/5562993277239"   target="_blank" rel="noreferrer" style={{ color: S.muted, textDecoration: 'none' }}>WhatsApp</a>
+            <a href="/terms"   style={{ color: S.muted, textDecoration: 'none' }}>Termos de Uso</a>
+            <a href="/privacy" style={{ color: S.muted, textDecoration: 'none' }}>Privacidade</a>
           </div>
         </div>
 

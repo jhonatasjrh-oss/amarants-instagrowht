@@ -284,9 +284,9 @@ function RegisterForm() {
 
               <p style={{ color: S.muted, fontSize: '11px', textAlign: 'center', marginTop: '20px', lineHeight: 1.6 }}>
                 Ao continuar você concorda com os{' '}
-                <span style={{ color: S.verde2, cursor: 'pointer' }}>Termos de Uso</span>
-                {' '}e{' '}
-                <span style={{ color: S.verde2, cursor: 'pointer' }}>Política de Privacidade</span>
+                <a href="/terms" target="_blank" rel="noreferrer" style={{ color: S.verde2, textDecoration: 'none', fontWeight: 600 }}>Termos de Uso</a>
+                {' '}e a{' '}
+                <a href="/privacy" target="_blank" rel="noreferrer" style={{ color: S.verde2, textDecoration: 'none', fontWeight: 600 }}>Política de Privacidade</a>
               </p>
             </div>
 
