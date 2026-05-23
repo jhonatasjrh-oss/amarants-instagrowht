@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  basePath: '/amarantsinstagrouth',
+  // basePath: '/amarantsinstagrouth',
 }
 
 export default nextConfig
