@@ -25,8 +25,9 @@ export default function ConnectInstagram() {
   const popupRef = useRef<Window | null>(null)
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const errParam = params.get('error')
+    const params      = new URLSearchParams(window.location.search)
+    const errParam    = params.get('error')
+    const connectedParam = params.get('connected')
     if (errParam) setErro(decodeURIComponent(errParam))
 
     supabase.auth.getUser().then(async ({ data }) => {
@@ -42,6 +43,17 @@ export default function ConnectInstagram() {
       if (kit?.instagram_connected && kit?.instagram_handle) {
         setConnected(true)
         setHandle(kit.instagram_handle)
+      } else if (connectedParam === 'true') {
+        // Fallback: popup não tinha opener, veio via redirect
+        const { data: freshKit } = await supabase
+          .from('brand_kit')
+          .select('instagram_handle,instagram_connected')
+          .eq('user_id', data.user.id)
+          .single()
+        if (freshKit?.instagram_connected && freshKit?.instagram_handle) {
+          setConnected(true)
+          setHandle(freshKit.instagram_handle)
+        }
       }
 
       setLoading(false)

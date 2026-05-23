@@ -12,6 +12,7 @@ function htmlClose(success: boolean, errorMsg?: string) {
       `<!DOCTYPE html><html><body><script>
         window.opener && window.opener.postMessage({ type: 'INSTAGRAM_CONNECTED', success: true }, '*');
         window.close();
+        setTimeout(function(){ if(!window.closed) window.location.href = 'http://localhost:3000/connect-instagram?connected=true'; }, 500);
       </script></body></html>`,
       { headers: { 'Content-Type': 'text/html' } }
     )
