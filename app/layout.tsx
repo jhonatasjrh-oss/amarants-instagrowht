@@ -9,8 +9,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Amarants Instagrowht",
-  description: "O sistema operacional de crescimento para Instagram",
+  title: 'Amarants Instagrowht',
+  description: 'Transforme seu Instagram em uma máquina de crescimento automático com Inteligência Artificial',
+  icons: {
+    icon: [
+      { url: '/logo-amarants.png', type: 'image/png' },
+    ],
+    apple: '/logo-amarants.png',
+    shortcut: '/logo-amarants.png',
+  },
 };
 
 export default function RootLayout({
