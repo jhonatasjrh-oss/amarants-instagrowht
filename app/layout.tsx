@@ -13,10 +13,10 @@ export const metadata: Metadata = {
   description: 'Transforme seu Instagram em uma máquina de crescimento automático com Inteligência Artificial',
   icons: {
     icon: [
-      { url: '/logo-amarants.png', type: 'image/png' },
+      { url: '/Logo_amarantsGroth.png', type: 'image/png' },
     ],
-    apple: '/logo-amarants.png',
-    shortcut: '/logo-amarants.png',
+    apple: '/Logo_amarantsGroth.png',
+    shortcut: '/Logo_amarantsGroth.png',
   },
 };
 
