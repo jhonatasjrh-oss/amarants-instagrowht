@@ -5,6 +5,72 @@ import { createClient } from '@supabase/supabase-js'
 const getOpenAI   = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 const getSupabase = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
+const IG_BASE = 'https://graph.instagram.com/v21.0'
+
+async function fetchInstagramProfile(userId: string): Promise<{
+  username?: string
+  followers_count?: number
+  media_count?: number
+  profile_picture_url?: string
+  biography?: string
+  website?: string
+  avgLikes?: number
+  avgComments?: number
+  engajamento_real?: string
+} | null> {
+  try {
+    const sb = getSupabase()
+    const { data: kit } = await sb
+      .from('brand_kit')
+      .select('instagram_access_token,instagram_token_expires_at,instagram_connected')
+      .eq('user_id', userId)
+      .single()
+
+    if (!kit?.instagram_access_token || !kit?.instagram_connected) return null
+    if (kit.instagram_token_expires_at && new Date(kit.instagram_token_expires_at) < new Date()) return null
+
+    const token = kit.instagram_access_token
+
+    const [profileRes, mediaRes] = await Promise.all([
+      fetch(`${IG_BASE}/me?fields=id,username,followers_count,media_count,profile_picture_url,biography,website&access_token=${token}`),
+      fetch(`${IG_BASE}/me/media?fields=id,like_count,comments_count&limit=12&access_token=${token}`),
+    ])
+
+    const profile = await profileRes.json()
+    const media   = await mediaRes.json()
+
+    if (profile.error) {
+      console.warn('[analyze-instagram] IG profile error:', profile.error.message)
+      return null
+    }
+
+    const posts         = (media.data || []) as Array<{ like_count?: number; comments_count?: number }>
+    const followers     = profile.followers_count || 0
+    const totalLikes    = posts.reduce((s: number, p) => s + (p.like_count || 0), 0)
+    const totalComments = posts.reduce((s: number, p) => s + (p.comments_count || 0), 0)
+    const avgLikes      = posts.length ? Math.round(totalLikes / posts.length) : 0
+    const avgComments   = posts.length ? Math.round(totalComments / posts.length) : 0
+    const engRate       = followers > 0 && posts.length > 0
+      ? (((totalLikes + totalComments) / posts.length) / followers * 100).toFixed(2) + '%'
+      : null
+
+    return {
+      username:            profile.username,
+      followers_count:     profile.followers_count ?? undefined,
+      media_count:         profile.media_count ?? undefined,
+      profile_picture_url: profile.profile_picture_url ?? undefined,
+      biography:           profile.biography ?? undefined,
+      website:             profile.website ?? undefined,
+      avgLikes,
+      avgComments,
+      engajamento_real:    engRate ?? undefined,
+    }
+  } catch (e: any) {
+    console.warn('[analyze-instagram] fetchInstagramProfile failed:', e.message)
+    return null
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { userId, instagram_handle, nicho } = await request.json()
@@ -16,11 +82,27 @@ export async function POST(request: NextRequest) {
     const handle   = (instagram_handle || '').replace('@', '').trim() || 'perfil'
     const nichoStr = nicho || 'negócios/empreendedorismo'
 
+    const igData = await fetchInstagramProfile(userId)
+
+    const dadosReais = igData
+      ? `
+DADOS REAIS DO PERFIL (verificados via Instagram Graph API):
+- Seguidores reais: ${igData.followers_count?.toLocaleString('pt-BR') ?? 'não disponível'}
+- Total de posts: ${igData.media_count ?? 'não disponível'}
+- Média de curtidas por post (últimos 12): ${igData.avgLikes ?? 'não disponível'}
+- Média de comentários por post (últimos 12): ${igData.avgComments ?? 'não disponível'}
+- Taxa de engajamento real: ${igData.engajamento_real ?? 'não disponível'}
+- Bio: ${igData.biography || 'não preenchida'}
+- Website: ${igData.website || 'não informado'}
+Use estes dados reais para calibrar o score, engajamento_estimado e frequencia_atual.`
+      : `NOTA: Dados reais não disponíveis — use estimativas baseadas no nicho.`
+
     const prompt = `
 Você é um especialista sênior em crescimento orgânico no Instagram com 10 anos de experiência, tendo ajudado mais de 500 perfis a crescerem de forma consistente e sustentável.
 
-Analise o perfil do Instagram: @${handle}
+Analise o perfil do Instagram: @${igData?.username || handle}
 Nicho declarado: ${nichoStr}
+${dadosReais}
 
 Gere uma análise PROFUNDA, DETALHADA e PERSONALIZADA. Seja extremamente específico — use exemplos reais de conteúdo, hashtags reais do nicho, horários baseados em dados reais do público brasileiro no Instagram.
 
@@ -195,13 +277,13 @@ IMPORTANTE:
       .from('instagram_analysis')
       .insert({
         user_id:              userId,
-        instagram_handle:     handle,
+        instagram_handle:     igData?.username || handle,
         score:                data.score,
         pontos_fortes:        data.pontos_fortes,
         pontos_fracos:        data.pontos_fracos,
         risco_shadowban:      data.risco_shadowban,
         frequencia_atual:     data.frequencia_atual,
-        engajamento_estimado: data.engajamento_estimado,
+        engajamento_estimado: igData?.engajamento_real || data.engajamento_estimado,
         plano_acao:           data.plano_acao,
       })
       .select()
@@ -209,7 +291,22 @@ IMPORTANTE:
 
     if (error) throw error
 
-    return NextResponse.json({ success: true, data: { ...data, id: saved.id } })
+    return NextResponse.json({
+      success: true,
+      data: {
+        ...data,
+        id:                   saved.id,
+        engajamento_estimado: igData?.engajamento_real || data.engajamento_estimado,
+        ig_profile: igData ? {
+          username:            igData.username,
+          followers_count:     igData.followers_count,
+          media_count:         igData.media_count,
+          profile_picture_url: igData.profile_picture_url,
+          biography:           igData.biography,
+          website:             igData.website,
+        } : null,
+      },
+    })
 
   } catch (error: any) {
     console.error('[analyze-instagram]', error.message)

@@ -16,6 +16,15 @@ const S = {
   side:  '#0d1f3c',
 }
 
+interface IgProfile {
+  username?:            string
+  followers_count?:     number
+  media_count?:         number
+  profile_picture_url?: string
+  biography?:           string
+  website?:             string
+}
+
 interface AnalysisData {
   score:               number
   pontos_fortes:       string[]
@@ -24,6 +33,7 @@ interface AnalysisData {
   frequencia_atual:    string
   engajamento_estimado:string
   plano_acao:          Record<string, unknown>
+  ig_profile?:         IgProfile | null
 }
 
 function ScoreCircle({ score }: { score: number }) {
@@ -191,7 +201,16 @@ function AnalyzePage() {
 
   if (!data) return null
 
-  const sbCor = shadowbanCor[data.risco_shadowban?.toLowerCase()] || S.muted
+  const sbCor  = shadowbanCor[data.risco_shadowban?.toLowerCase()] || S.muted
+  const ig     = data.ig_profile
+  const igName = ig?.username || handle || 'seu perfil'
+
+  function fmtNum(n?: number | null) {
+    if (n == null) return '—'
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace('.0', '') + 'M'
+    if (n >= 1_000)     return (n / 1_000).toFixed(1).replace('.0', '') + 'k'
+    return String(n)
+  }
 
   return (
     <>
@@ -214,14 +233,48 @@ function AnalyzePage() {
           </div>
 
           {/* Título */}
-          <div className="fade-up" style={{ animationDelay: '0.1s', marginBottom: '28px' }}>
+          <div className="fade-up" style={{ animationDelay: '0.1s', marginBottom: '20px' }}>
             <h1 style={{ color: S.texto, fontWeight: 900, fontSize: '28px', margin: '0 0 8px', letterSpacing: '-0.5px' }}>
-              Diagnóstico do perfil <span style={{ color: S.verde }}>@{handle || 'seu perfil'}</span>
+              Diagnóstico do perfil <span style={{ color: S.verde }}>@{igName}</span>
             </h1>
             <p style={{ color: S.muted, fontSize: '15px', margin: 0 }}>
               Análise gerada por IA — resultados personalizados para o seu nicho
             </p>
           </div>
+
+          {/* Perfil do Instagram */}
+          {ig && (
+            <div className="fade-up" style={{ animationDelay: '0.13s', background: S.card, border: `1px solid ${S.borda}`, borderRadius: '20px', padding: '20px 28px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+              {ig.profile_picture_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={ig.profile_picture_url}
+                  alt={`@${igName}`}
+                  width={68}
+                  height={68}
+                  style={{ borderRadius: '50%', objectFit: 'cover', border: `3px solid ${S.verde}`, flexShrink: 0 }}
+                />
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                  <span style={{ color: S.texto, fontWeight: 900, fontSize: '17px' }}>@{igName}</span>
+                  <span style={{ background: 'rgba(61,184,96,0.12)', border: '1px solid rgba(61,184,96,0.3)', color: S.verde, fontSize: '10px', fontWeight: 800, padding: '3px 10px', borderRadius: '20px', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                    ✓ Dados verificados pelo Instagram
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '28px' }}>
+                  <div>
+                    <div style={{ color: S.texto, fontWeight: 900, fontSize: '20px', lineHeight: 1 }}>{fmtNum(ig.followers_count)}</div>
+                    <div style={{ color: S.muted, fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '3px' }}>Seguidores</div>
+                  </div>
+                  <div>
+                    <div style={{ color: S.texto, fontWeight: 900, fontSize: '20px', lineHeight: 1 }}>{ig.media_count ?? '—'}</div>
+                    <div style={{ color: S.muted, fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '3px' }}>Posts</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Score + métricas */}
           <div className="fade-up" style={{ animationDelay: '0.15s', background: S.card, border: `1px solid ${S.borda}`, borderRadius: '20px', padding: '32px', marginBottom: '20px', display: 'flex', gap: '40px', alignItems: 'center', flexWrap: 'wrap' }}>
