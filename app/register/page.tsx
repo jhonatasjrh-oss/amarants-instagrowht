@@ -70,7 +70,7 @@ function RegisterForm() {
       }
 
       if (data.session) {
-        window.location.href = '/connect-instagram'
+        window.location.href = '/amarantsinstagrouth/connect-instagram'
       } else {
         setEmailEnviado(true)
       }

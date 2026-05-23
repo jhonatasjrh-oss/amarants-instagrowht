@@ -84,7 +84,7 @@ function AnalyzePage() {
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: authData }) => {
-      if (!authData.user) { window.location.href = '/login'; return }
+      if (!authData.user) { window.location.href = '/amarantsinstagrouth/login'; return }
       setUserId(authData.user.id)
 
       const { data: kit } = await supabase
@@ -117,7 +117,7 @@ function AnalyzePage() {
   async function runAnalysis(uid: string, igHandle: string, nic: string) {
     const timer = animateMsgs()
     try {
-      const res  = await fetch('/api/analyze-instagram', {
+      const res  = await fetch('/amarantsinstagrouth/api/analyze-instagram', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ userId: uid, instagram_handle: igHandle, nicho: nic }),
@@ -344,7 +344,7 @@ function AnalyzePage() {
               </div>
             </div>
             <button
-              onClick={() => { window.location.href = '/action-plan' }}
+              onClick={() => { window.location.href = '/amarantsinstagrouth/action-plan' }}
               style={{ padding: '16px 36px', background: S.verde, color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 800, fontSize: '16px', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 4px 16px rgba(61,184,96,0.4)', fontFamily: 'Inter, sans-serif', letterSpacing: '0.3px' }}
             >
               Ver meu plano de ação →

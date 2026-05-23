@@ -16,17 +16,26 @@ const S = {
 }
 
 export default function ConnectInstagram() {
-  const [userId,    setUserId]    = useState('')
-  const [connected, setConnected] = useState(false)
-  const [handle,    setHandle]    = useState('')
-  const [loading,   setLoading]   = useState(true)
-  const [connecting,setConnecting]= useState(false)
-  const [erro,      setErro]      = useState('')
-  const popupRef = useRef<Window | null>(null)
+  const [userId,     setUserId]     = useState('')
+  const [connected,  setConnected]  = useState(false)
+  const [handle,     setHandle]     = useState('')
+  const [loading,    setLoading]    = useState(true)
+  const [connecting, setConnecting] = useState(false)
+  const [erro,       setErro]       = useState('')
+
+  const popupRef   = useRef<Window | null>(null)
+  const pollRef    = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Limpa o interval ao desmontar
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current)
+    }
+  }, [])
 
   useEffect(() => {
-    const params      = new URLSearchParams(window.location.search)
-    const errParam    = params.get('error')
+    const params         = new URLSearchParams(window.location.search)
+    const errParam       = params.get('error')
     const connectedParam = params.get('connected')
     if (errParam) setErro(decodeURIComponent(errParam))
 
@@ -60,36 +69,34 @@ export default function ConnectInstagram() {
     })
   }, [])
 
-  useEffect(() => {
-    function onMessage(event: MessageEvent) {
-      if (event.data?.type !== 'INSTAGRAM_CONNECTED') return
-      if (!event.data?.success) return
+  function startPolling() {
+    if (pollRef.current) clearInterval(pollRef.current)
 
-      popupRef.current?.close()
-      setConnecting(false)
+    pollRef.current = setInterval(async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-      // Recarrega dados do brand_kit para pegar handle atualizado
-      supabase.auth.getUser().then(async ({ data }) => {
-        if (!data.user) return
-        const { data: kit } = await supabase
-          .from('brand_kit')
-          .select('instagram_handle,instagram_connected')
-          .eq('user_id', data.user.id)
-          .single()
-        if (kit?.instagram_connected && kit?.instagram_handle) {
-          setConnected(true)
-          setHandle(kit.instagram_handle)
-        }
-      })
-    }
+      const { data: kit } = await supabase
+        .from('brand_kit')
+        .select('instagram_handle,instagram_connected')
+        .eq('user_id', user.id)
+        .single()
 
-    window.addEventListener('message', onMessage)
-    return () => window.removeEventListener('message', onMessage)
-  }, [])
+      if (kit?.instagram_connected && kit?.instagram_handle) {
+        clearInterval(pollRef.current!)
+        pollRef.current = null
+        popupRef.current?.close()
+        setConnecting(false)
+        setConnected(true)
+        setHandle(kit.instagram_handle)
+      }
+    }, 2000)
+  }
 
   function handleConectar() {
     setErro('')
     setConnecting(true)
+
     const popup = window.open(
       '/api/auth/instagram',
       'instagram_oauth',
@@ -97,17 +104,24 @@ export default function ConnectInstagram() {
     )
     popupRef.current = popup
 
+    // Inicia polling para detectar conexão no Supabase
+    startPolling()
+
     // Detecta popup fechado manualmente sem completar o OAuth
-    const timer = setInterval(() => {
+    const closeTimer = setInterval(() => {
       if (popup?.closed) {
-        clearInterval(timer)
+        clearInterval(closeTimer)
+        if (pollRef.current) {
+          clearInterval(pollRef.current)
+          pollRef.current = null
+        }
         setConnecting(false)
       }
     }, 500)
   }
 
   function handleContinuar() {
-    window.location.href = '/analyze'
+    window.location.href = '/amarantsinstagrouth/analyze'
   }
 
   return (
@@ -182,7 +196,6 @@ export default function ConnectInstagram() {
               <p style={{ color: S.muted, fontSize: '15px', margin: 0 }}>Carregando...</p>
             </div>
           ) : connected ? (
-            /* Estado: conta conectada */
             <>
               <div style={{ animation: 'float 3s ease-in-out infinite', fontSize: '56px', marginBottom: '24px' }}>✅</div>
 
@@ -216,7 +229,6 @@ export default function ConnectInstagram() {
               </p>
             </>
           ) : (
-            /* Estado: não conectado */
             <>
               <div style={{ animation: 'float 3s ease-in-out infinite', fontSize: '56px', marginBottom: '24px' }}>📱</div>
 
@@ -228,7 +240,6 @@ export default function ConnectInstagram() {
                 seus dados reais e criar um plano personalizado.
               </p>
 
-              {/* Benefícios */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '32px', textAlign: 'left' }}>
                 {[
                   ['📊', 'Análise com dados reais de seguidores e engajamento'],
@@ -242,7 +253,6 @@ export default function ConnectInstagram() {
                 ))}
               </div>
 
-              {/* Erro */}
               {erro && (
                 <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', fontSize: '13px', padding: '11px 14px', borderRadius: '9px', marginBottom: '16px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span>⚠️</span> {erro}

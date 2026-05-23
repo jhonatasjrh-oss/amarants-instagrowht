@@ -12,7 +12,7 @@ function htmlClose(success: boolean, errorMsg?: string) {
       `<!DOCTYPE html><html><body><script>
         window.opener && window.opener.postMessage({ type: 'INSTAGRAM_CONNECTED', success: true }, '*');
         window.close();
-        setTimeout(function(){ if(!window.closed) window.location.href = 'http://localhost:3000/connect-instagram?connected=true'; }, 500);
+        setTimeout(function(){ if(!window.closed) window.location.href = 'http://localhost:3000/amarantsinstagrouth/connect-instagram?connected=true'; }, 500);
       </script></body></html>`,
       { headers: { 'Content-Type': 'text/html' } }
     )
@@ -23,7 +23,7 @@ function htmlClose(success: boolean, errorMsg?: string) {
     `<!DOCTYPE html><html><body><script>
       window.opener && window.opener.postMessage({ type: 'INSTAGRAM_CONNECTED', success: false, error: '${errorMsg?.replace(/'/g, "\\'")}' }, '*');
       window.close();
-      setTimeout(function(){ window.location.href = '${APP_URL}/connect-instagram?error=${encoded}'; }, 300);
+      setTimeout(function(){ window.location.href = '${APP_URL}/amarantsinstagrouth/connect-instagram?error=${encoded}'; }, 300);
     </script></body></html>`,
     { headers: { 'Content-Type': 'text/html' } }
   )

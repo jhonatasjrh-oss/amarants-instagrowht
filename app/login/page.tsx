@@ -42,7 +42,7 @@ export default function Login() {
         })
         if (error) throw error
       }
-      window.location.href = '/dashboard'
+      window.location.href = '/amarantsinstagrouth/dashboard'
     } catch (error: any) {
       setErro(error.message)
     } finally {

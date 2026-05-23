@@ -135,16 +135,16 @@ export default function ActionPlan() {
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: authData }) => {
-      if (!authData.user) { window.location.href = '/login'; return }
+      if (!authData.user) { window.location.href = '/amarantsinstagrouth/login'; return }
       const uid = authData.user.id
       setUserId(uid)
-      const res  = await fetch(`/api/analyze-instagram?userId=${uid}`)
+      const res  = await fetch(`/amarantsinstagrouth/api/analyze-instagram?userId=${uid}`)
       const json = await res.json()
       if (json.success && json.data) {
         setAnalysis(json.data)
         setLoading(false)
       } else {
-        window.location.href = '/analyze'
+        window.location.href = '/amarantsinstagrouth/analyze'
       }
     })
   }, [])
@@ -157,7 +157,7 @@ export default function ActionPlan() {
         onboarding_completo: true,
         updated_at:          new Date().toISOString(),
       }, { onConflict: 'user_id' })
-      window.location.href = '/dashboard'
+      window.location.href = '/amarantsinstagrouth/dashboard'
     } catch (e: any) {
       setErro(e.message)
       setSalvando(false)
@@ -780,7 +780,7 @@ export default function ActionPlan() {
         <div style={{ background: S.card, borderRadius: '20px', padding: '48px', textAlign: 'center', maxWidth: '420px' }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
           <p style={{ color: S.muted, fontSize: '14px', marginBottom: '24px' }}>{erro || 'Plano não encontrado.'}</p>
-          <button type="button" onClick={() => { window.location.href = '/connect-instagram' }} style={{ padding: '12px 28px', background: S.verde, color: '#fff', border: 'none', borderRadius: '9px', fontWeight: 700, cursor: 'pointer', fontSize: '14px', fontFamily: 'Inter, sans-serif' }}>
+          <button type="button" onClick={() => { window.location.href = '/amarantsinstagrouth/connect-instagram' }} style={{ padding: '12px 28px', background: S.verde, color: '#fff', border: 'none', borderRadius: '9px', fontWeight: 700, cursor: 'pointer', fontSize: '14px', fontFamily: 'Inter, sans-serif' }}>
             Voltar ao início
           </button>
         </div>
