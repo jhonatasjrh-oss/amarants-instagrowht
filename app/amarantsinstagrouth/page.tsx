@@ -182,10 +182,10 @@ export default function LandingPage() {
         borderBottom: navSolid ? '1px solid rgba(233,30,140,0.2)' : '1px solid transparent',
         transition: 'all 0.3s',
       }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 16px' : '0 24px', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 16px' : '0 24px', height: 84, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Logo */}
           <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <Image src="/Logo_amarantsGroth.png" alt="Amarants" width={0} height={0} sizes="100vw" style={{ width: 'auto', height: isMobile ? '52px' : '72px', objectFit: 'contain' }} />
+            <Image src="/Logo_amarantsGroth.png" alt="Amarants" width={0} height={0} sizes="100vw" style={{ width: 'auto', height: isMobile ? '64px' : '88px', objectFit: 'contain' }} />
             <span style={{
               fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
               fontWeight: 800,
@@ -295,7 +295,7 @@ export default function LandingPage() {
       <section style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center',
         background: 'linear-gradient(135deg, #1a0533 0%, #0a0a0f 50%, #001a33 100%)',
-        position: 'relative', overflow: 'hidden', paddingTop: 68,
+        position: 'relative', overflow: 'hidden', paddingTop: 84,
       }}>
         <div style={{ position: 'absolute', top: -200, left: -200, width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(233,30,140,0.12) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -200, right: -200, width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 65%)', pointerEvents: 'none' }} />
